@@ -31,23 +31,25 @@ export default function DisciplinasOverview() {
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         if (!response.ok) {
           throw new Error('Erro ao buscar disciplinas');
         }
-
+  
         const data = await response.json();
-        setDisciplinas(data.subjects || []);
+        // Pegando apenas as duas primeiras disciplinas
+        setDisciplinas((data.subjects || []).slice(0, 2));
       } catch (error) {
         console.error('Erro ao buscar disciplinas:', error);
         setDisciplinas([]);
       }
     };
-
+  
     if (id && token) {
       fetchDisciplinas();
     }
   }, [id, token]);
+  
 
   return (
     <View style={styles.DisciplinasContainer}>
@@ -116,7 +118,9 @@ const styles = StyleSheet.create({
     marginLeft: 120,
   },
   verTudoContainer: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'tranparent',
+    position: "absolute",
+    right: 15,
   },
   DisciplinasFlex: {
     flexDirection: 'row',

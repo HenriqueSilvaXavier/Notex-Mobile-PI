@@ -10,14 +10,17 @@ import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from '../contexts/AuthContext';
 import { useContext, useState, useEffect } from 'react';
 import { useClass } from '../contexts/ClassContext';
+import ConceitosOverview from "../components/ConceitosOverview";
+import SearchContainer from "../components/SearchContainer";
 
 export default function Overview() {
   const { authData } = useContext(AuthContext);
-  const { CPF, nome, token, foto } = authData;
+  const { studentId, CPF, nome, token, foto } = authData;
   const { setClassData } = useClass();
   const navigation = useNavigation();
   const [fontLoaded] = useFonts({ Nunito_500Medium });
   const [responseData, setResponseData] = useState({ title: '', year: '', code: '', id: '' });
+  const [scrolling, setScrolling] = useState(false);
 
   // Função para buscar os dados
   const fetchData = async () => {
@@ -33,23 +36,21 @@ export default function Overview() {
         throw new Error("Erro na requisição: " + response.status);
       }
       const data = await response.json();
-      console.log(data);
       setResponseData({
         title: data.title,
         year: data.year,
         code: data.code,
         id: data.id
       });
-      setClassData({ id: data.id }); // Usando data.id diretamente para setar o classData
+      setClassData({ id: data.id }); 
     } catch (error) {
       console.error("Erro ao buscar os dados:", error);
     }
   };
 
   useEffect(() => {
-    // Chama a função de buscar dados logo após o componente ser montado
     fetchData();
-  }, []); // A dependência vazia [] faz com que o efeito seja executado apenas uma vez
+  }, []);
 
   if (!fontLoaded) {
     return null;
@@ -70,10 +71,23 @@ export default function Overview() {
           />
         </View>
       </View>
-
+      <SearchContainer/>
       <ScrollView contentContainerStyle={styles.ScrollContainer}>
         <View style={styles.MainContainer}>
-          <MinhaTurmaOverview turma={responseData.title} ano={responseData.year} id={responseData.code} />
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.HorizontalScrollContainer}
+            onScroll={(event) => {
+              const contentOffsetX = event.nativeEvent.contentOffset.x;
+              setScrolling(contentOffsetX > 0); // Define como true se houver rolagem
+            }}
+            scrollEventThrottle={16}
+          >
+            <MinhaTurmaOverview turma={responseData.title} ano={responseData.year} id={responseData.code} />
+            {/* Só exibe ConceitosOverview se o usuário rolar */}
+            <ConceitosOverview />
+          </ScrollView>
           <CalendarioEAgenda atividade="AV2 Biologia" data="28 de novembro" professor="Lucas Almeida" />
           <TouchableOpacity style={styles.AgendaView} onPress={() => navigation.navigate('Calendario')}>
             <Text>Agenda</Text>
@@ -81,7 +95,6 @@ export default function Overview() {
           <DisciplinasOverview />
         </View>
       </ScrollView>
-
       <MenuInferior overviewProp={true} calendarProp={false} />
     </SafeAreaView>
   );
@@ -140,5 +153,9 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 3000,
-  }
+  },
+  HorizontalScrollContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: "16%",
+  },
 });

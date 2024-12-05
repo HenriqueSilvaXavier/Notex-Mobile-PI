@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logoWrapper: {
-    flex: 1,
+    flex: 0.8, 
     justifyContent: 'center',
     alignItems: 'center',
   },

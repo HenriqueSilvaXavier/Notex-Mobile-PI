@@ -18,6 +18,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center", // Alinha o conteúdo verticalmente no centro
     marginTop: 25, // Adiciona espaço acima do campo de pesquisa
+    height: 35,
+    width: 250,
+    marginHorizontal: 'auto'
   },
   searchInput: {
     borderColor: "rgba(0, 0, 0, 0.15)",
@@ -30,8 +33,6 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     position: "absolute",
-    right: 60, // Ajuste a posição do ícone
-    top: "50%",
-    transform: [{ translateY: -12 }], // Centraliza o ícone verticalmente
+    right: 5, // Ajuste a posição do ícone
   },
 });

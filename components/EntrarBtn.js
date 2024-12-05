@@ -11,7 +11,7 @@ export default function EntrarBtn({ page }) {
 
   const handleLogin = async () => {
     if (page === "Overview") {
-      const { CPF, senha, nome } = authData;
+      const { CPF, senha, nome, studentId } = authData;
   
       if (!CPF || !senha) {
         Alert.alert('Erro', 'CPF e senha são obrigatórios!');
@@ -28,7 +28,7 @@ export default function EntrarBtn({ page }) {
         console.log('Resposta da API:', response.data);
         
         if (response.data.token) {
-          setAuthData({ CPF, senha, token: response.data.token, nome: response.data.user.name, foto: response.data.user.avatarUrl});
+          setAuthData({ CPF, senha, studentId: response.data.user.id, token: response.data.token, nome: response.data.user.name, foto: response.data.user.avatarUrl});
           console.log('Auth Data:', authData);
           navigation.navigate(page);
         } else {

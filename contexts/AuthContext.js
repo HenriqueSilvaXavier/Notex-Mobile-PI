@@ -14,7 +14,7 @@ export const useAuth = () => {
 
 // Provedor de autenticação
 export const AuthProvider = ({ children }) => {
-  const [authData, setAuthData] = useState({ CPF: '', senha: '', token: '', nome: '', foto: ''});
+  const [authData, setAuthData] = useState({ studentId: '', CPF: '', senha: '', token: '', nome: '', foto: ''});
 
   return (
     <AuthContext.Provider value={{ authData, setAuthData }}>

@@ -13,6 +13,7 @@ import MinhaTurma from './screens/MinhaTurmaScreen';
 import Estudantes from './screens/EstudantesScreen';
 import Horario from './screens/HorarioScreen';
 import Comunicados from './screens/ComunicadosScreen';
+import Conceitos from './screens/ConceitosScreen';
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -66,6 +67,11 @@ export default function App() {
               <Stack.Screen 
                 name="Comunicados" 
                 component={Comunicados} 
+                options={{ headerTitle: '', headerShown: false }} 
+              />
+              <Stack.Screen 
+                name="Conceitos" 
+                component={Conceitos} 
                 options={{ headerTitle: '', headerShown: false }} 
               />
             </Stack.Navigator>

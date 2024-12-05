@@ -24,7 +24,7 @@ export default function Calendario() {
     const { selectedDay } = useContext(SelectedDayContext);
     const [ordem, setOrdem] = useState(true);
     const [events, setEvents] = useState({
-        '2024-11-25': [
+        '2024-12-03': [
             {
                 subject: 'Matemática',
                 chapter: 'Chapter 1: Funções',
@@ -43,7 +43,7 @@ export default function Calendario() {
                 endTime: '11:30',
             },
         ],
-        '2024-11-26': [
+        '2024-12-04': [
             {
                 subject: 'Matemática',
                 chapter: 'Chapter 1: Funções',
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
     ordemBtnCalendario:{
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 158
+        position: 'absolute',
+        right: 16,
     },
 });
