@@ -10,10 +10,10 @@ Expo CLI para rodar o projeto.
 Clone o repositório:
 
 ```bash
-Copy code
 git clone <URL_DO_REPOSITORIO>
 cd <NOME_DIRETORIO_PROJETO>
 npm install
+
 #2️⃣ Configuração do IP da Rede
 Encontre o IP local executando:
 
