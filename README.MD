@@ -1,4 +1,4 @@
-### Projeto React Native com Expo
+# Projeto React Native com Expo
 Este projeto utiliza React Native e Expo para o desenvolvimento de aplicativos móveis.
 
 ##📋 Pré-requisitos
@@ -6,7 +6,7 @@ Node.js instalado.
 npm ou yarn como gerenciador de pacotes.
 Expo CLI para rodar o projeto.
 ##🚀 Passos para execução
-#1️⃣ Instalação das dependências
+###1️⃣ Instalação das dependências
 Clone o repositório:
 
 ```bash
@@ -14,7 +14,7 @@ git clone <URL_DO_REPOSITORIO>
 cd <NOME_DIRETORIO_PROJETO>
 npm install
 
-#2️⃣ Configuração do IP da Rede
+###2️⃣ Configuração do IP da Rede
 Encontre o IP local executando:
 
 ```bash
@@ -22,7 +22,7 @@ Copy code
 ipconfig
 Copie o IPv4 correspondente à sua conexão e substitua o IP no projeto nos arquivos como app.json, metro.config.js ou outros arquivos de rede.
 
-#3️⃣ Rodando o projeto
+###3️⃣ Rodando o projeto
 Execute o servidor de desenvolvimento:
 
 ```bash
