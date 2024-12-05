@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
     ordemBtnHorario:{
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 158
+        position: 'absolute',
+        right: 15,
     },
 });
