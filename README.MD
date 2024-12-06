@@ -1,13 +1,13 @@
 # Projeto React Native com Expo
 Este projeto utiliza React Native e Expo para o desenvolvimento de aplicativos móveis.
 
-##📋 Pré-requisitos
+## 📋 Pré-requisitos
 Node.js instalado.
 npm ou yarn como gerenciador de pacotes.
 
 Expo CLI para rodar o projeto.
 
-##🚀 Passos para execução
+## 🚀 Passos para execução
 
 ### 1️⃣ Instalação das dependências
 Clone o repositório:
