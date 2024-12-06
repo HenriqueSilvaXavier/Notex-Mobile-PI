@@ -5,7 +5,7 @@ import { useFonts, Poppins_400Regular } from '@expo-google-fonts/poppins';
 import { Nunito_500Medium, Nunito_300Light } from '@expo-google-fonts/nunito'
 import DoisPontosSVG from '../assets/DoisPontosSVG';
 
-export default function ConceitosOverview() {
+export default function ConceitosOverview({ rolagem }) {
   const navigation=useNavigation();
   const [fontLoaded]=useFonts({
     Poppins_400Regular,
@@ -17,7 +17,7 @@ export default function ConceitosOverview() {
     return null;
   };
   return (
-    <View style={styles.ConceitosContainer}>
+    <View style={[styles.ConceitosContainer, { marginLeft: rolagem ? 75 : 0 }]}>
         <Text style={styles.ConceitosTitulo}>Conceitos</Text>
         <Text style={styles.ConceitosDescricao}>Veja seus conceitos disponíveis</Text>
         <TouchableOpacity onPress={()=>navigation.navigate('Conceitos')}>
@@ -42,7 +42,6 @@ export default function ConceitosOverview() {
 const styles = StyleSheet.create({
   ConceitosContainer:{
     width: 270,
-    marginLeft: 75,
   },
   buttonWrapper: {
     width: '100%',

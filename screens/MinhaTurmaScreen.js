@@ -1,4 +1,5 @@
 import React, {useContext, useState} from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, Image, FlatList } from "react-native";
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import TopFlex from "../components/TopFlex";
@@ -15,32 +16,54 @@ import LibrarySVG from "../assets/Libary";
 import MailSVG from "../assets/MailSVG";
 import MenuInferior from "../components/MenuInferior";
 import { useNavigation } from "@react-navigation/native";
+import { SearchContext } from "../contexts/SearchContext";
 
 function MinhaTurma() {
-  const navigation=useNavigation();
-    const [fontLoaded] = useFonts({
-        Nunito_500Medium,
-        Poppins_600SemiBold,
-        Poppins_500Medium,
-        Poppins_400Regular
-    });
-    const { diaSelecionado } = useContext(SelectedDayContext);
-    const [events, setEvents] = useState({
-        '6': [
-            {
-                subject: 'Entrega de atividade',
-                chapter: 'Disciplina: Gramática',
-                location: 'Sala 205',
-                teacher: 'Julie Watson',
-                startTime: '13:15',
-                endTime: '14:45',
-                photo: JulieWatsonSVG,
-            },
-        ],
-    });
+  const navigation = useNavigation();
+  const [fontLoaded] = useFonts({
+    Nunito_500Medium,
+    Poppins_600SemiBold,
+    Poppins_500Medium,
+    Poppins_400Regular,
+  });
+  const { diaSelecionado } = useContext(SelectedDayContext);
+  const { pesquisa, setPesquisa } = useContext(SearchContext);
 
-    const dayEvents = events[diaSelecionado] || [];
-    const event = dayEvents[0];
+  const [events, setEvents] = useState({
+    '6': [
+      {
+        subject: 'Entrega de atividade',
+        chapter: 'Disciplina: Gramática',
+        location: 'Sala 205',
+        teacher: 'Julie Watson',
+        startTime: '13:15',
+        endTime: '14:45',
+        photo: JulieWatsonSVG,
+      },
+    ],
+  });
+
+  const dayEvents = events[diaSelecionado] || [];
+  const event = dayEvents[0];
+
+  const topics = [
+    { id: 1, label: 'Estudantes', icon: <ChapeuDeBecaSVG />, route: 'Estudantes' },
+    { id: 2, label: 'Disciplinas', icon: <LibrarySVG />, route: 'Disciplinas' },
+    { id: 3, label: 'Comunicados', icon: <MailSVG />, route: 'Comunicados' },
+    { id: 4, label: 'Horário', icon: <MailSVG />, route: 'Horario' },
+  ];
+
+  // Filtro dos tópicos com base na pesquisa
+  const filteredTopics = topics.filter(topic =>
+    topic.label.toLowerCase().includes(pesquisa.toLowerCase())
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setPesquisa(''); // Reseta a pesquisa ao focar na página
+    }, [setPesquisa])
+  );
+
   return (
     <SafeAreaView style={styles.MinhaTurmaContainer}>
       <TopFlex titulo="Minha Turma" />
@@ -51,56 +74,51 @@ function MinhaTurma() {
           <View style={styles.header}>
             <Text style={styles.headerText}>Agenda</Text>
             <Icon
-                name='chevron-down-circle-outline'
-                size={20}
-                color='white'// Mudar a cor do ícone
-                style={styles.chevron}
+              name="chevron-down-circle-outline"
+              size={20}
+              color="white"
+              style={styles.chevron}
             />
           </View>
           {event ? (
             <View style={styles.content}>
-                <View style={styles.timeContainer}>
-                    <Text style={styles.time}>{event.startTime}</Text>
-                    <Text style={styles.endTime}>{event.endTime}</Text>
+              <View style={styles.timeContainer}>
+                <Text style={styles.time}>{event.startTime}</Text>
+                <Text style={styles.endTime}>{event.endTime}</Text>
+              </View>
+              <View style={styles.info}>
+                <Text style={styles.title}>{event.subject}</Text>
+                <Text style={styles.subtitle}>{event.chapter}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <MarkPointCinza />
+                  <Text style={styles.room}>{event.location}</Text>
                 </View>
-                <View style={styles.info}>
-                    <Text style={styles.title}>{event.subject}</Text>
-                    <Text style={styles.subtitle}>{event.chapter}</Text>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <MarkPointCinza/>
-                        <Text style={styles.room}>{event.location}</Text>
-                    </View>
-                    <View style={styles.teacherContainer}>
-                        <JulieWatsonSVG />
-                        <Text style={styles.teacher}>{event.teacher}</Text>
-                    </View>
+                <View style={styles.teacherContainer}>
+                  <JulieWatsonSVG />
+                  <Text style={styles.teacher}>{event.teacher}</Text>
                 </View>
+              </View>
             </View>
           ) : (
             <Text style={styles.noEvents}>Nenhum evento para este dia</Text>
           )}
         </View>
-        <TouchableOpacity onPress={()=> navigation.navigate('Estudantes')} style={styles.topicContainer}>
-            <ChapeuDeBecaSVG/>
-            <Text style={styles.topicText}>Estudantes</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.topicContainer} onPress={()=> navigation.navigate('Disciplinas')}>
-            <LibrarySVG/>
-            <Text style={styles.topicText}>Disciplinas</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.topicContainer} onPress={()=> navigation.navigate('Comunicados')}>
-            <MailSVG/>
-            <Text style={styles.topicText}>Comunicados</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=> navigation.navigate('Horario')} style={[styles.topicContainer, {marginBottom: 70}]}>
-            <MailSVG/>
-            <Text style={styles.topicText}>Horário</Text>
-        </TouchableOpacity>
+        {filteredTopics.map(topic => (
+          <TouchableOpacity
+            key={topic.id}
+            style={styles.topicContainer}
+            onPress={() => navigation.navigate(topic.route)}
+          >
+            {topic.icon}
+            <Text style={styles.topicText}>{topic.label}</Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
-      <MenuInferior overviewProp={false} calendarProp={true}/>
+      <MenuInferior overviewProp={false} calendarProp={true} />
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

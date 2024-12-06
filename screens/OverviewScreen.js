@@ -1,17 +1,18 @@
 import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity, Image } from "react-native";
-import Logo from "../assets/mediotec-mobile 8";
+import Logo from "../assets/mediotec-mobile 8"; // Inclua a extensão correta do arquivo
 import NotificationsSVG from "../assets/notifications";
 import MinhaTurmaOverview from "../components/MinhaTurmaOverview";
 import CalendarioEAgenda from "../components/CalendarioEAgenda";
 import MenuInferior from "../components/MenuInferior";
 import { useFonts, Nunito_500Medium } from "@expo-google-fonts/nunito";
 import DisciplinasOverview from "../components/DisciplinasOverview";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { AuthContext } from '../contexts/AuthContext';
-import { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useClass } from '../contexts/ClassContext';
 import ConceitosOverview from "../components/ConceitosOverview";
 import SearchContainer from "../components/SearchContainer";
+import { SearchContext } from "../contexts/SearchContext";
 
 export default function Overview() {
   const { authData } = useContext(AuthContext);
@@ -21,8 +22,8 @@ export default function Overview() {
   const [fontLoaded] = useFonts({ Nunito_500Medium });
   const [responseData, setResponseData] = useState({ title: '', year: '', code: '', id: '' });
   const [scrolling, setScrolling] = useState(false);
+  const { pesquisa, setPesquisa } = useContext(SearchContext);
 
-  // Função para buscar os dados
   const fetchData = async () => {
     try {
       const response = await fetch(`http://192.168.1.12:4000/studying/cpf/${CPF}`, {
@@ -42,7 +43,7 @@ export default function Overview() {
         code: data.code,
         id: data.id
       });
-      setClassData({ id: data.id }); 
+      setClassData({ id: data.id });
     } catch (error) {
       console.error("Erro ao buscar os dados:", error);
     }
@@ -51,11 +52,22 @@ export default function Overview() {
   useEffect(() => {
     fetchData();
   }, []);
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      setPesquisa(''); // Reseta a pesquisa ao focar na página
+    }, [setPesquisa])
+  );
 
   if (!fontLoaded) {
     return null;
   }
 
+  const isMinhaTurmaSearch = 'Minha Turma'.toLowerCase().includes(pesquisa.toLowerCase());
+  const isConceitosSearch = 'Conceitos'.toLowerCase().includes(pesquisa.toLowerCase());
+  const isAgendaSearch = 'Agenda'.toLowerCase().includes(pesquisa.toLowerCase());
+  const isCalendarioEAgendaSearch = 'Calendario e Agenda'.toLowerCase().includes(pesquisa.toLowerCase());
+  const isDisciplinasSearch = 'Disciplinas'.toLowerCase().includes(pesquisa.toLowerCase());
   return (
     <SafeAreaView style={styles.OverviewContainer}>
       <View style={styles.TopFlex}>
@@ -66,33 +78,39 @@ export default function Overview() {
             <NotificationsSVG />
           </View>
           <Image
-            source={{uri: foto}}
+            source={{ uri: foto }}
             style={styles.avatar}
           />
         </View>
       </View>
-      <SearchContainer/>
+      <SearchContainer />
       <ScrollView contentContainerStyle={styles.ScrollContainer}>
         <View style={styles.MainContainer}>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
-            contentContainerStyle={styles.HorizontalScrollContainer}
-            onScroll={(event) => {
-              const contentOffsetX = event.nativeEvent.contentOffset.x;
-              setScrolling(contentOffsetX > 0); // Define como true se houver rolagem
-            }}
-            scrollEventThrottle={16}
-          >
+          {isConceitosSearch && isMinhaTurmaSearch ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.HorizontalScrollContainer}
+              onScroll={(event) => {
+                const contentOffsetX = event.nativeEvent.contentOffset.x;
+                setScrolling(contentOffsetX > 0);
+              }}
+              scrollEventThrottle={16}
+            >
+              <MinhaTurmaOverview turma={responseData.title} ano={responseData.year} id={responseData.code} />
+              
+              <ConceitosOverview rolagem={true}/>
+            </ScrollView>
+          ) : isMinhaTurmaSearch ? (
             <MinhaTurmaOverview turma={responseData.title} ano={responseData.year} id={responseData.code} />
-            {/* Só exibe ConceitosOverview se o usuário rolar */}
-            <ConceitosOverview />
-          </ScrollView>
-          <CalendarioEAgenda atividade="AV2 Biologia" data="28 de novembro" professor="Lucas Almeida" />
-          <TouchableOpacity style={styles.AgendaView} onPress={() => navigation.navigate('Calendario')}>
+          ) : isConceitosSearch ? (
+            <ConceitosOverview rolagem={false}/>
+          ) : null}
+          {isCalendarioEAgendaSearch && <CalendarioEAgenda atividade="AV2 Biologia" data="28 de novembro" professor="Lucas Almeida" /> }
+          {isAgendaSearch && <TouchableOpacity style={styles.AgendaView} onPress={() => navigation.navigate('Calendario')}> 
             <Text>Agenda</Text>
-          </TouchableOpacity>
-          <DisciplinasOverview />
+          </TouchableOpacity> }
+          {isDisciplinasSearch && <DisciplinasOverview /> }
         </View>
       </ScrollView>
       <MenuInferior overviewProp={true} calendarProp={false} />
@@ -149,7 +167,7 @@ const styles = StyleSheet.create({
     right: 15,
     gap: 3,
   },
-  avatar:{
+  avatar: {
     width: 30,
     height: 30,
     borderRadius: 3000,
@@ -158,4 +176,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: "16%",
   },
+  Conceitos:{
+    marginRight: 30,
+  }
 });

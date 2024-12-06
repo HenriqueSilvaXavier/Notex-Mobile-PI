@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'; 
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import TopFlex from "../components/TopFlex";
@@ -7,6 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MenuInferior from "../components/MenuInferior";
 import { AuthContext } from '../contexts/AuthContext'; // Verifique o caminho correto
 import { ClassContext } from '../contexts/ClassContext'; // Verifique o caminho correto
+import { SearchContext } from '../contexts/SearchContext';
 
 function Disciplinas() {
   const { authData } = useContext(AuthContext);
@@ -19,6 +21,7 @@ function Disciplinas() {
   const [expandedCards, setExpandedCards] = useState({
     1: true, // Primeiro card expandido por padrão
   });
+  const { pesquisa, setPesquisa } = useContext(SearchContext);
 
   // Fetch disciplinas
   useEffect(() => {
@@ -70,14 +73,21 @@ function Disciplinas() {
   const toggleExpand = (cardId) => {
     setExpandedCards((prev) => ({ ...prev, [cardId]: !prev[cardId] }));
   };
-
+  const disciplinasFiltradas = disciplinas.filter(disciplina =>
+    (disciplina.name || '').toLowerCase().includes((pesquisa || '').toLowerCase())
+  );
+  useFocusEffect(
+    React.useCallback(() => {
+        setPesquisa(""); // Reseta a pesquisa ao focar na página
+    }, [setPesquisa])
+  );
   return (
     <SafeAreaView style={styles.container}>
       <TopFlex titulo='Disciplinas' />
       <SearchContainer />
       <ScrollView style={styles.cardContainer}>
-        {disciplinas.length > 0 ? (
-          disciplinas.map((item) => (
+        {disciplinasFiltradas.length > 0 ? (
+          disciplinasFiltradas.map((item) => (
             <TouchableOpacity
               key={item.id}
               onPress={() => toggleExpand(item.id)}

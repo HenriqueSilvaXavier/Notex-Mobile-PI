@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'; 
+import { useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, FlatList } from "react-native";
-
 import { useFonts, Nunito_500Medium } from "@expo-google-fonts/nunito";
 import { Poppins_500Medium, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { useNavigation } from '@react-navigation/native';
@@ -16,10 +16,12 @@ import DiasDaSemana from '../components/DiasDaSemana';
 import { SelectedDayContext } from '../contexts/SelectedDayContext';
 import SortAmountDownSVG from '../assets/SortAmountDownSVG';
 import SortAmountUpSVG from '../assets/SortAmountUpSVG';
+import { SearchContext } from '../contexts/SearchContext';
 
 export default function Horario(){
     const { diaSelecionado } = useContext(SelectedDayContext);
     const [ordem, setOrdem] = useState(true);
+    const { pesquisa, setPesquisa } = useContext(SearchContext);
     const [events, setEvents] = useState({
         "4":[{
                 subject: 'Matemática',
@@ -55,10 +57,20 @@ export default function Horario(){
             }
         ],
     })
-
+    const eventosFiltrados = Object.keys(events).reduce((acc, key) => {
+        const eventosDoDia = events[key].filter(event =>
+            (event.subject || '').toLowerCase().includes((pesquisa || '').toLowerCase())
+        );
+        return { ...acc, [key]: eventosDoDia };
+    }, {});
+    useFocusEffect(
+        React.useCallback(() => {
+            setPesquisa(""); // Reseta a pesquisa ao focar na página
+        }, [setPesquisa])
+    );
     const renderEvents = () => {
         if (!diaSelecionado) return null;
-        const dayEvents = events[diaSelecionado] || [];
+        const dayEvents = eventosFiltrados[diaSelecionado] || [];
         return (
             <View style={{ flex: 1 }}>
                 {dayEvents.length > 0 ? (

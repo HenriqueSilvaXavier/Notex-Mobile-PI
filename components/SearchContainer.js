@@ -1,12 +1,13 @@
 import { StyleSheet, View, Text, SafeAreaView, TextInput, ScrollView } from "react-native";
 import SearchSymbol from "../assets/search";
-
+import { SearchContext } from "../contexts/SearchContext";
+import { useContext } from "react";
 
 export default function SearchContainer() {
-
+  const { pesquisa, setPesquisa } = useContext(SearchContext);
   return (
       <View style={styles.searchContainer}>
-        <TextInput placeholder="Procurar..." style={styles.searchInput} />
+        <TextInput placeholder="Procurar..." style={styles.searchInput} value={pesquisa} onChangeText={(e)=> setPesquisa(e)}/>
         <SearchSymbol style={styles.searchIcon} />
       </View>
   );

@@ -1,7 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { AuthContext } from '../contexts/AuthContext.js'; // Certifique-se de que o AuthContext está correto
 import { ClassContext } from '../contexts/ClassContext.js';
+import { SearchContext } from "../contexts/SearchContext";
 import EstudanteElemento from "../components/EstudanteElemento";
 import MenuInferior from '../components/MenuInferior.js';
 import SearchContainer from "../components/SearchContainer";
@@ -10,10 +12,11 @@ import DefaultAvatar from "../assets/defaultAvatar.jsx";
 
 function Estudantes() {
     const { authData } = useContext(AuthContext);
-    const { CPF, nome, token } = authData; // Pega o token aqui
+    const { CPF, nome, token } = authData;
     const { classData } = useContext(ClassContext);
     const { id } = classData;
     const [estudantes, setEstudantes] = useState([]);
+    const { pesquisa, setPesquisa } = useContext(SearchContext);
 
     useEffect(() => {
         const fetchEstudantes = async () => {
@@ -27,11 +30,10 @@ function Estudantes() {
                 });
                 const data = await response.json();
                 if (Array.isArray(data.users)) {
-                    // Ordena os estudantes: você em primeiro, os outros em ordem alfabética
                     const estudantesOrdenados = data.users.sort((a, b) => {
-                        if (a.name === nome) return -1; // Você no topo
-                        if (b.name === nome) return 1;  // Você no topo
-                        return a.name.localeCompare(b.name); // Ordem alfabética
+                        if (a.name === nome) return -1;
+                        if (b.name === nome) return 1;
+                        return a.name.localeCompare(b.name);
                     });
                     setEstudantes(estudantesOrdenados);
                 } else {
@@ -44,24 +46,33 @@ function Estudantes() {
         };
 
         fetchEstudantes();
-    }, [id, token, nome]); // Adiciona nome como dependência
+    }, [id, token, nome]);
 
+    console.log(pesquisa);
+    const estudantesFiltrados = estudantes.filter(estudante =>
+        (estudante.name || '').toLowerCase().includes((pesquisa || '').toLowerCase())
+    );
+    useFocusEffect(
+        React.useCallback(() => {
+            setPesquisa(""); // Reseta a pesquisa ao focar na página
+        }, [setPesquisa])
+    );
     return (
         <SafeAreaView style={styles.safeArea}>
             <TopFlex titulo='Estudantes'/>
             <SearchContainer />
             <ScrollView style={styles.scrollView}>
-                {estudantes.length > 0 ? (
-                    estudantes.map((estudante) => (
+                {estudantesFiltrados.length > 0 ? (
+                    estudantesFiltrados.map((estudante) => (
                         <EstudanteElemento 
                             key={estudante.id} 
-                            fotoEstudante={estudante.avatarUrl || DefaultAvatar} // Usar uma imagem padrão
+                            fotoEstudante={estudante.avatarUrl || DefaultAvatar}
                             nomeEstudante={estudante.name} 
                         />
                     ))
                 ) : (
                     <EstudanteElemento
-                        fotoEstudante={DefaultAvatar} // Usar imagem padrão
+                        fotoEstudante={DefaultAvatar}
                         nomeEstudante="Nenhum estudante encontrado"
                     />
                 )}
@@ -70,6 +81,7 @@ function Estudantes() {
         </SafeAreaView>
     );
 }
+
 
 const styles = StyleSheet.create({
     safeArea: {

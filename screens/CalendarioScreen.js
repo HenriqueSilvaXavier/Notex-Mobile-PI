@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react'; 
+import { useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "react-native-vector-icons"; 
 import NotificationsSVG from "../assets/notifications";
@@ -19,6 +20,7 @@ import DiasDaSemana from '../components/DiasDaSemana';
 import { SelectedDayContext } from '../contexts/SelectedDayContext';
 import SortAmountDownSVG from '../assets/SortAmountDownSVG';
 import SortAmountUpSVG from '../assets/SortAmountUpSVG';
+import { SearchContext } from '../contexts/SearchContext';
 
 export default function Calendario() {
     const { selectedDay } = useContext(SelectedDayContext);
@@ -74,9 +76,27 @@ export default function Calendario() {
         ],
     });
 
+    const { pesquisa, setPesquisa } = useContext(SearchContext);
+
+    const eventosFiltrados = Object.keys(events).reduce((acc, key) => {
+        const eventosDoDia = events[key].filter(event =>
+            event.subject.toLowerCase().includes(pesquisa.toLowerCase())
+        );
+        if (eventosDoDia.length > 0) {
+            acc[key] = eventosDoDia;
+        }
+        return acc;
+    }, {});
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setPesquisa(""); // Reseta a pesquisa ao focar na página
+        }, [setPesquisa])
+    );
+
     const renderEvents = () => {
         if (!selectedDay) return null;
-        const dayEvents = events[selectedDay.format('YYYY-MM-DD')] || [];
+        const dayEvents = eventosFiltrados[selectedDay.format('YYYY-MM-DD')] || [];
         const sortedEvents = [...dayEvents].sort((a, b) => {
             const aTime = moment(a.startTime, 'HH:mm');
             const bTime = moment(b.startTime, 'HH:mm');
@@ -87,7 +107,7 @@ export default function Calendario() {
             <View style={{ flex: 1 }}>
                 {sortedEvents.length > 0 ? (
                     <FlatList
-                        data={ordem ? sortedEvents : sortedEvents.slice().reverse()}
+                        data={sortedEvents}
                         renderItem={({ item, index }) => (
                             <View style={styles.card}>
                                 <View style={styles.timeContainer}>
@@ -207,27 +227,28 @@ const styles = StyleSheet.create({
     },
     detail: {
         fontSize: 14,
-        color: '#555',
     },
     noEvents: {
-        fontSize: 16,
-        color: '#888',
         textAlign: 'center',
         marginTop: 20,
-    },
-    disciplinasLabel: {
-        fontFamily: 'Nunito_500Medium',
-        color: '#BCC1CD',
+        fontSize: 18,
+        color: '#888',
     },
     horarioLabel: {
-        fontFamily: 'Nunito_500Medium',
-        color: '#BCC1CD',
-        marginRight: 11,
+        flex: 1,
+        fontSize: 14,
+        fontWeight: 'bold',
     },
-    ordemBtnCalendario:{
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
-        right: 16,
+    disciplinasLabel: {
+        flex: 2,
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    ordemBtnCalendario: {
+        marginLeft: 10,
+    },
+    icon: {
+        width: 24,
+        height: 24,
     },
 });

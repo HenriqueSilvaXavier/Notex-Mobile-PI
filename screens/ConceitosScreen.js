@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
 import TopFlex from "../components/TopFlex";
 import SearchContainer from "../components/SearchContainer";
 import { useClass } from '../contexts/ClassContext'; // Usando o hook para acessar o contexto
 import { AuthContext } from '../contexts/AuthContext';
+import { SearchContext } from "../contexts/SearchContext";
 
 const Conceitos = () => {
   const { classData } = useClass(); // Obtendo o classData usando o hook
@@ -13,6 +15,7 @@ const Conceitos = () => {
   const [disciplinas, setDisciplinas] = useState([]);
   const [conceitos, setConceitos] = useState([]);
   const [loading, setLoading] = useState(true); // Controle de carregamento
+  const { pesquisa, setPesquisa } = useContext(SearchContext);
 
   useEffect(() => {
     const fetchDisciplinas = async () => {
@@ -86,8 +89,12 @@ const Conceitos = () => {
     return "EXCELENTE";
   };
 
+  const disciplinasFiltradas = disciplinas.filter(disciplina =>
+    (disciplina.name || '').toLowerCase().includes((pesquisa || '').toLowerCase())
+  );
+
   // Mapeando os conceitos para as disciplinas correspondentes
-  const dados = disciplinas.map(disciplina => {
+  const dados = disciplinasFiltradas.map(disciplina => {
     const conceito = conceitos.find(con => con.subjectId === disciplina.id);
     const av1Value = conceito ? getConceitoValue(conceito.av1) : null;
     const av2Value = conceito ? getConceitoValue(conceito.av2) : null;
@@ -111,7 +118,12 @@ const Conceitos = () => {
       situacao: situacao,
     };
   });
-  
+
+useFocusEffect(
+  React.useCallback(() => {
+      setPesquisa(""); // Reseta a pesquisa ao focar na página
+  }, [setPesquisa])
+);
 
   const renderHeader = () => (
     <View style={[styles.row, styles.headerRow]}>

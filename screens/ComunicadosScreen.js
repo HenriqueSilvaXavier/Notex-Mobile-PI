@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, FlatList, SafeAreaView } from "react-native";
 import TopFlex from "../components/TopFlex";
 import { useNavigation } from '@react-navigation/native';
 import SearchContainer from "../components/SearchContainer";
 import MenuInferior from "../components/MenuInferior";
 import { AuthContext } from "../contexts/AuthContext";
+import { SearchContext } from "../contexts/SearchContext";
 
 const Comunicados = () => {
   const { authData } = useContext(AuthContext);
   const { token } = authData; // Pega o token aqui
   const [comunicados, setComunicados] = useState([]); // Estado para armazenar os comunicados
   const [loading, setLoading] = useState(true); // Estado para indicar se os dados estão sendo carregados
+  const { pesquisa, setPesquisa } = useContext(SearchContext);
 
   useEffect(() => {
     // Função para buscar os dados da API
@@ -47,7 +50,14 @@ const Comunicados = () => {
 
     fetchComunicados(); // Chama a função de busca ao carregar o componente
   }, [token]); // Agora depende do token, para garantir que ele seja atualizado caso mude
-
+  const comunicadosFiltrados = comunicados.filter(comunicado =>
+    (comunicado.titulo || '').toLowerCase().includes((pesquisa || '').toLowerCase())
+  );
+useFocusEffect(
+  React.useCallback(() => {
+      setPesquisa(""); // Reseta a pesquisa ao focar na página
+  }, [setPesquisa])
+);
   const Comunicado = ({ titulo, autor, data, descricao, style }) => {
     return (
       <View style={[styles.card, style]}>
@@ -71,7 +81,7 @@ const Comunicados = () => {
       ) : (
         <FlatList
           style={styles.ComunicadosContainer}
-          data={comunicados}
+          data={comunicadosFiltrados}
           keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (
             <Comunicado
@@ -79,7 +89,7 @@ const Comunicados = () => {
               autor={item.autor}
               data={item.data}
               descricao={item.descricao}
-              style={index === comunicados.length - 1 ? styles.lastItem : {}}
+              style={index === comunicadosFiltrados.length - 1 ? styles.lastItem : {}}
             />
           )}
         />
