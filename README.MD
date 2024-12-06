@@ -12,7 +12,8 @@ Expo CLI para rodar o projeto.
 #1️⃣ Instalação das dependências
 Clone o repositório:
 
-```bash git clone <URL_DO_REPOSITORIO>
+```bash 
+git clone <URL_DO_REPOSITORIO>
 cd <NOME_DIRETORIO_PROJETO>
 npm install
 
