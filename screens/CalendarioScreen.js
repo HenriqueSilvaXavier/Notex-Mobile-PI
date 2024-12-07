@@ -97,17 +97,11 @@ export default function Calendario() {
     const renderEvents = () => {
         if (!selectedDay) return null;
         const dayEvents = eventosFiltrados[selectedDay.format('YYYY-MM-DD')] || [];
-        const sortedEvents = [...dayEvents].sort((a, b) => {
-            const aTime = moment(a.startTime, 'HH:mm');
-            const bTime = moment(b.startTime, 'HH:mm');
-            return ordem ? aTime.isBefore(bTime) : bTime.isBefore(aTime);
-        });
-
         return (
             <View style={{ flex: 1 }}>
-                {sortedEvents.length > 0 ? (
+                {dayEvents.length > 0 ? (
                     <FlatList
-                        data={sortedEvents}
+                        data={ordem? dayEvents : dayEvents.slice().reverse()}
                         renderItem={({ item, index }) => (
                             <View style={styles.card}>
                                 <View style={styles.timeContainer}>
