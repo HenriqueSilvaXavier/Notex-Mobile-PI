@@ -17,6 +17,7 @@ import MailSVG from "../assets/MailSVG";
 import MenuInferior from "../components/MenuInferior";
 import { useNavigation } from "@react-navigation/native";
 import { SearchContext } from "../contexts/SearchContext";
+import Timetable from "../assets/timetable";
 
 function MinhaTurma() {
   const navigation = useNavigation();
@@ -50,7 +51,7 @@ function MinhaTurma() {
     { id: 1, label: 'Estudantes', icon: <ChapeuDeBecaSVG />, route: 'Estudantes' },
     { id: 2, label: 'Disciplinas', icon: <LibrarySVG />, route: 'Disciplinas' },
     { id: 3, label: 'Comunicados', icon: <MailSVG />, route: 'Comunicados' },
-    { id: 4, label: 'Horário', icon: <MailSVG />, route: 'Horario' },
+    { id: 4, label: 'Horário', icon: <Timetable />, route: 'Horario' },
   ];
 
   // Filtro dos tópicos com base na pesquisa

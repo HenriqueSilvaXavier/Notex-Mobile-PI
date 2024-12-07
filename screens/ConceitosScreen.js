@@ -58,10 +58,6 @@ const Conceitos = () => {
     setLoading(false);  // Após carregar as informações
   }, [id, studentId]);
 
-  if (loading) {
-    return <Text>Carregando...</Text>; // Exibe uma mensagem enquanto os dados não estão carregados
-  }
-
   // Função para converter conceito em valor numérico
   const getConceitoValue = (conceito) => {
     switch (conceito) {
